@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welfare Party Dynamic AI Dashboard 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;600;700;900&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; height: 100vh; overflow-x: hidden; }
+        
+        .dashboard-header { 
+            background: linear-gradient(135deg, #001e3c 0%, #003366 100%); 
+            border-bottom: 4px solid #fbbf24;
+        }
+        .dashboard-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.15em;
+            word-spacing: 0.3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .progress-bar-fill { background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 50%, #dc2626 100%); transition: width 1.5s ease-in-out; }
+        .stat-card { position: relative; overflow: hidden; border-radius: 15px; padding: 0.75rem; color: white; text-align: center; }
+        .hidden { display: none; }
+        
+        .ai-card-glow { border-left: 6px solid #1e40af; border-radius: 12px; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .gemini-live-tag { animation: pulse 2s infinite; font-size: 8px; background: #1e40af; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 900; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        * { font-style: normal !important; }
+    </style>
+</head>
+<body class="text-slate-900 lg:flex lg:flex-col">
+
+    <header class="dashboard-header text-white p-5 shadow-2xl text-center sticky top-0 z-50 shrink-0">
+        <h1 class="text-xl md:text-3xl font-black uppercase">
+            WELFARE PARTY MALAPPURAM MANDALAM <br class="md:hidden"> COLLECTION - 2026
+        </h1>
+        <p class="text-[10px] md:text-xs opacity-90 font-bold uppercase tracking-widest text-yellow-400 mt-2">
+            Target Deadline: February 10, 2026 | 19 Days Remaining
+        </p>
+    </header>
+
+    <main class="p-2 md:p-6 max-w-[1700px] mx-auto w-full lg:flex-1 overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+            
+            <div class="lg:col-span-7 flex flex-col gap-5 overflow-y-auto pr-1">
+                
+                <div class="bg-white p-5 rounded-3xl shadow-lg border border-slate-100">
+                    <div class="flex justify-between items-end mb-3">
+                        <div>
+                            <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Mandalam Collected</p>
+                            <h2 id="total-collected" class="text-3xl md:text-5xl font-black text-blue-900 leading-none">₹ 0</h2>
+                            <p class="text-[11px] font-bold text-slate-500 mt-2 uppercase">Total Goal: <span id="total-target" class="text-slate-800">₹ 0</span></p>
+                        </div>
+                        <div class="text-right">
+                            <span id="total-percentage" class="font-black text-blue-900 text-3xl md:text-5xl leading-none">0%</span>
+                        </div>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-5 overflow-hidden border">
+                        <div id="main-progress" class="progress-bar-fill h-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="ai-card-glow p-5 border-t-4 border-t-blue-900">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="gemini-live-tag uppercase tracking-widest">Mandalam AI Advisor</span>
+                        <div class="text-right">
+                            <span class="text-[9px] font-black text-slate-400 block uppercase">Daily Target Need</span>
+                            <span id="mandalam-daily-amt" class="text-lg font-black text-blue-900">₹ 0</span>
+                        </div>
+                    </div>
+                    <p id="mandalam-ai-msg" class="text-sm md:text-base font-bold text-slate-800 leading-relaxed italic">Analyzing mandalam data...</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="stat-card bg-emerald-600 shadow-md">
+                        <span class="text-[9px] font-black uppercase opacity-80 block">Top Panchayath</span>
+                        <p id="top-panchayat" class="text-[12px] font-black truncate mt-1">--</p>
+                    </div>
+                    <div class="stat-card bg-blue-600 shadow-md">
+                        <span class="text-[9px] font-black uppercase opacity-80 block">Top Unit</span>
+                        <p id="top-unit" class="text-[12px] font-black truncate mt-1">--</p>
+                    </div>
+                    <div class="stat-card bg-rose-600 shadow-md">
+                        <span class="text-[9px] font-black uppercase opacity-80 block">Focus Unit</span>
+                        <p id="low-unit" class="text-[12px] font-black truncate mt-1">--</p>
+                    </div>
+                    <div class="stat-card bg-orange-500 shadow-md">
+                        <span class="text-[9px] font-black uppercase opacity-80 block">Focus Pan.</span>
+                        <p id="low-panchayat" class="text-[12px] font-black truncate mt-1">--</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 shrink-0">
+                    <div class="h-[250px] w-full"><canvas id="panchayatChart"></canvas></div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-md overflow-hidden border border-slate-100 mb-6">
+                    <div class="bg-slate-900 text-white p-3 text-xs font-black uppercase text-center tracking-widest italic">Panchayath-wise Performance</div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b">
+                                <tr><th class="p-4 pl-6">Panchayath</th><th class="p-4">Collected</th><th class="p-4 text-right pr-6">Status</th></tr>
+                            </thead>
+                            <tbody id="panchayat-table-body" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 h-full flex flex-col overflow-hidden">
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col h-full">
+                    <div class="bg-blue-800 text-white p-4 flex justify-between items-center shrink-0">
+                        <span class="font-black uppercase text-[10px] tracking-widest italic">Unit-wise Live Status</span>
+                        <div class="flex gap-2">
+                            <button onclick="sortData('percent')" id="sort-pct-btn" class="bg-white text-blue-800 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase">Sort %</button>
+                            <button onclick="sortData('amount')" id="sort-amt-btn" class="bg-transparent text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-white/30">Sort Amt</button>
+                        </div>
+                    </div>
+                    <div class="overflow-y-auto flex-1 bg-slate-50/20">
+                        <table class="w-full border-collapse">
+                            <tbody id="unit-table-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        Chart.register(ChartDataLabels);
+
+        const TARGET_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTb39w593ytTuXMolBvhPju9GBVFwPtpO80gzI-F8PSWhpVT0bGfm6KYFi3arIDmrqktmmhkfNg0We4/pub?gid=1934154804&single=true&output=csv';
+        const DAILY_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTb39w593ytTuXMolBvhPju9GBVFwPtpO80gzI-F8PSWhpVT0bGfm6KYFi3arIDmrqktmmhkfNg0We4/pub?gid=311568616&single=true&output=csv';
+        const DAYS_REMAINING = 19;
+
+        const PANCHAYAT_MAP = {
+            "ആമക്കാട്": "ആനക്കയം", "ഇരുമ്പുഴി": "ആനക്കയം", "പന്തല്ലൂർ": "ആനക്കയം", "പാപ്പിനിപ്പാറ": "ആനക്കയം", "പെриമ്പലം": "ആനക്കയം",
+            "ഉമ്മത്തൂർ": "കോഡൂർ", "കരീപറമ്പ": "കോഡൂർ", "കോഡൂർ": "കോഡൂർ", "താണിക്കൽ": "കോഡൂർ", "മങ്ങാട്ടുപുലം": "കോഡൂർ", "വടക്കെമണ്ണ": "കോഡൂർ", "വലിയാട്": "കോഡൂർ", "ചോലക്കൽ": "കോഡൂർ",
+            "ചെറുപുത്തൂർ": "പുൽപ്പറ്റ", "തൃപ്പനച്ചി": "പുൽപ്പറ്റ", "അത്താണിക്കൽ": "പൂക്കോട്ടൂർ",
+            "അറവങ്കര": "പൂക്കോട്ടൂർ", "പൂക്കോട്ടൂർ പള്ളിമുക്ക്": "പൂക്കോട്ടൂർ", "പൂക്കോട്ടൂർ ലക്ഷം വീട്": "പൂക്കോട്ടൂർ", "മുണ്ടിതൊടിക": "പൂക്കോട്ടൂർ", "വള്ളുവമ്പ്രം": "പൂക്കോട്ടൂർ", "മേലേമുക്ക്": "പൂക്കോട്ടൂർ", "ഹാഫ് വള്ളുവമ്പ്രം": "പൂക്കോട്ടൂർ",
+            "ഇത്തിൾപറമ്പ്": "മലപ്പുറം", "കാളമ്പാടി": "മലപ്പുറം","കുന്നുമ്മൽ": "മലപ്പുറം", "കോട്ടപ്പടി": "മലപ്പുറം","ചീനിത്തോട്": "മലപ്പുറം", "പട്ടർകടവ്": "മലപ്പുറം", "പൈത്തിനിപറമ്പ്‌": "മലപ്പുറം", "മുണ്ടുപറമ്പ്": "മലപ്പുറം", "അതികാരത്തൊടി(മേൽമുറി)": "മലപ്പുറം", "മൈലപ്പുറം" : "മലപ്പുറം", "വലിയങ്ങാടി": "മലപ്പുറം", "ഹാജിയാർ പള്ളി": "മലപ്പുറം",
+            "മൊറയൂർ": "മൊറയൂർ", "മോങ്ങം": "മൊറയൂർ", "വാലഞ്ചേരി": "മൊറയൂർ", "അരിമ്പ്ര": "മൊറയൂർ", "ഒഴുകൂർ": "മൊറയൂർ"
+        };
+
+        let globalUnits = [];
+        let globalPanchayats = [];
+
+        document.addEventListener('DOMContentLoaded', fetchData);
+
+        async function fetchData() {
+            try {
+                const [tRes, dRes] = await Promise.all([ fetch(TARGET_SHEET_URL), fetch(DAILY_SHEET_URL) ]);
+                const tRows = (await tRes.text()).split('\n').slice(1);
+                const dRows = (await dRes.text()).split('\n').slice(1);
+
+                let units = {}; let pans = {};
+                tRows.forEach(row => {
+                    const cols = row.split(',').map(c => c.trim());
+                    if (!cols[0] || !PANCHAYAT_MAP[cols[0]]) return;
+                    units[cols[0]] = { name: cols[0], target: parseFloat(cols[1]) || 0, coll: 0, sT: 0, hT: 0, pName: PANCHAYAT_MAP[cols[0]], history: [] };
+                    if (!pans[PANCHAYAT_MAP[cols[0]]]) pans[PANCHAYAT_MAP[cols[0]]] = { name: PANCHAYAT_MAP[cols[0]], target: 0, coll: 0 };
+                    pans[PANCHAYAT_MAP[cols[0]]].target += parseFloat(cols[1]) || 0;
+                });
+
+                dRows.forEach(row => {
+                    const cols = row.split(',').map(c => c.trim());
+                    if (units[cols[0]]) {
+                        const amt = parseFloat(cols[1]) || 0;
+                        units[cols[0]].coll += amt;
+                        units[cols[0]].sT += parseInt(cols[3]) || 0;
+                        units[cols[0]].hT += parseInt(cols[4]) || 0;
+                        units[cols[0]].history.push({ date: cols[2], amt, squad: cols[3], house: cols[4] });
+                        pans[units[cols[0]].pName].coll += amt;
+                    }
+                });
+
+                globalUnits = Object.values(units).map(u => ({...u, percent: u.target > 0 ? parseFloat(((u.coll/u.target)*100).toFixed(1)) : 0}));
+                globalPanchayats = Object.values(pans).map(p => ({...p, percent: p.target > 0 ? parseFloat(((p.coll/p.target)*100).toFixed(1)) : 0}));
+                sortData('percent');
+            } catch (e) { console.error(e); }
+        }
+
+        function toggleAccordion(id, group) {
+            const isHidden = document.getElementById(id).classList.contains('hidden');
+            document.querySelectorAll('.' + group).forEach(item => item.classList.add('hidden'));
+            if (isHidden) document.getElementById(id).classList.remove('hidden');
+        }
+
+        // --- ENHANCED DYNAMIC UNIT AI ---
+        function generateUnitAI(u) {
+            const balance = u.target - u.coll;
+            const daily = Math.ceil(balance / DAYS_REMAINING);
+            
+            // Celebration for completed
+            if (u.percent >= 100) return {
+                msg: `അഭിനന്ദനങ്ങൾ! ${u.name} ലക്ഷ്യം പൂർത്തിയാക്കി. മണ്ഡലത്തിന് മാതൃകയായി തുടരുക.`,
+                rem: `ഓർമ്മപ്പെടുത്തൽ: അധികമായി ലഭിക്കുന്ന തുകകൾ മണ്ഡലത്തിന്റെ പൊതുലക്ഷ്യത്തിലേക്ക് ഉടൻ ലയിപ്പിക്കുക.`
+            };
+
+            // Urgent focus for high percentage
+            if (u.percent >= 80) return {
+                msg: `${u.name} ലക്ഷ്യത്തിന്റെ തൊട്ടരികിലാണ്. ഇനി വെറും ₹${balance.toLocaleString()} കൂടി മതി.`,
+                rem: `ഓർമ്മപ്പെടുത്തൽ: വരാനിരിക്കുന്ന അവധി ദിവസത്തിനുള്ളിൽ തന്നെ ലക്ഷ്യം പൂർത്തിയാക്കാൻ ശ്രമിക്കുക.`
+            };
+
+            // Dynamic logic based on squad work
+            let squadMsg = u.sT === 0 ? "സ്ക്വാഡ് പ്രവർത്തനം ഉടൻ തുടങ്ങേണ്ടതുണ്ട്." : `നിലവിൽ ${u.sT} സ്ക്വാഡുകൾ ഇറങ്ങിയിട്ടുണ്ട്, വേഗത വർദ്ധിപ്പിക്കുക.`;
+            
+            const tips = [
+                `ഓർമ്മപ്പെടുത്തൽ: പ്രവാസി സുഹൃത്തുക്കളിൽ നിന്ന് കൂടുതൽ വിഹിതം കണ്ടെത്താൻ ഓൺലൈൻ മീറ്റിംഗ് പ്ലാൻ ചെയ്യുക.`,
+                `ഓർമ്മപ്പെടുത്തൽ: പ്രദേശത്തെ വ്യാപാരികളിൽ നിന്നും അഭ്യുദയകാംക്ഷികളിൽ നിന്നും വലിയ തുകകൾ കണ്ടെത്തുക.`,
+                `ഓർമ്മപ്പെടുത്തൽ: ഓരോ പ്രവർത്തകനും ഓരോ പുതിയ കുടുംബത്തെ കണ്ടെത്താൻ നിർദ്ദേശം നൽകുക.`
+            ];
+
+            return {
+                msg: `${u.name} ഇപ്പോൾ ${u.percent}% പുരോഗതിയിലാണ്. ദിവസേന ₹${daily.toLocaleString()} വീതം ശേഖരിക്കണം. ${squadMsg}`,
+                rem: tips[Math.floor(Math.random() * tips.length)]
+            };
+        }
+
+        function sortData(criteria) {
+            if (criteria === 'percent') globalUnits.sort((a,b) => b.percent - a.percent);
+            else globalUnits.sort((a,b) => b.coll - a.coll);
+            updateUI();
+        }
+
+        function updateUI() {
+            const tTarget = globalPanchayats.reduce((a, b) => a + b.target, 0);
+            const tColl = globalPanchayats.reduce((a, b) => a + b.coll, 0);
+            const overallP = tTarget > 0 ? ((tColl/tTarget)*100).toFixed(1) : 0;
+            const dailyM = Math.max(0, Math.ceil((tTarget - tColl) / DAYS_REMAINING));
+
+            document.getElementById('total-collected').innerText = '₹ ' + tColl.toLocaleString('en-IN');
+            document.getElementById('total-target').innerText = '₹ ' + tTarget.toLocaleString('en-IN');
+            document.getElementById('total-percentage').innerText = overallP + '%';
+            document.getElementById('main-progress').style.width = overallP + '%';
+            document.getElementById('mandalam-daily-amt').innerText = '₹' + dailyM.toLocaleString();
+
+            // Mandalam AI Advice
+            const mandalamMsgs = [
+                `മണ്ഡലം ഇപ്പോൾ ${overallP}% നിലവാരത്തിലാണ്. ഫെബ്രുവരി 10-ഓടെ പൂർത്തിയാക്കാൻ ദിവസേന ₹${dailyM.toLocaleString()} ശേഖരിക്കണം.`,
+                `പുരോഗതി തൃപ്തികരമാണ്. പിന്നിലുള്ള വാർഡുകളെ സഹായിക്കാൻ പ്രത്യേക ടീമിനെ സജ്ജമാക്കുക.`,
+                `ശ്രദ്ധിക്കുക! വരാനിരിക്കുന്ന ദിവസങ്ങളിൽ കൂടുതൽ സ്ക്വാഡുകളെ സജ്ജമാക്കാൻ മണ്ഡലം കമ്മിറ്റി ശ്രദ്ധിക്കണം.`
+            ];
+            document.getElementById('mandalam-ai-msg').innerText = mandalamMsgs[Math.floor(Math.random() * mandalamMsgs.length)];
+
+            const sortedUnits = [...globalUnits].sort((a,b) => b.percent - a.percent);
+            const sortedPans = [...globalPanchayats].sort((a,b) => b.percent - a.percent);
+
+            document.getElementById('top-panchayat').innerText = sortedPans[0]?.name || '--';
+            document.getElementById('top-unit').innerText = sortedUnits[0]?.name || '--';
+            document.getElementById('low-unit').innerText = sortedUnits[sortedUnits.length-1]?.name || '--';
+            document.getElementById('low-panchayat').innerText = sortedPans[sortedPans.length-1]?.name || '--';
+
+            // Panchayath Table
+            document.getElementById('panchayat-table-body').innerHTML = sortedPans.map((p, i) => `
+                <tr class="hover:bg-slate-50 cursor-pointer" onclick="toggleAccordion('pan-drop-${i}', 'pan-row')">
+                    <td class="p-4 pl-6 font-bold text-slate-800">${p.name} <span class="text-blue-500 text-[8px]">▼</span></td>
+                    <td class="p-4 font-black">₹${p.coll.toLocaleString()}</td>
+                    <td class="p-4 text-right pr-6"><span class="bg-blue-900 text-white px-2 py-0.5 rounded font-black text-[10px]">${p.percent}%</span></td>
+                </tr>
+                <tr id="pan-drop-${i}" class="hidden pan-row bg-slate-50"><td colspan="3" class="p-4">
+                    <div class="bg-white border rounded-2xl p-3 space-y-1 shadow-inner">
+                        ${globalUnits.filter(u => u.pName === p.name).sort((a,b)=>b.percent-a.percent).map(u => `
+                            <div class="flex justify-between text-[11px] border-b last:border-0 pb-1.5 pt-1">
+                                <span class="font-bold">${u.name}</span>
+                                <span class="font-black text-blue-700">₹${u.coll.toLocaleString()} (${u.percent}%)</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </td></tr>`).join('');
+
+            // Unit Table with Per-Unit AI
+            document.getElementById('unit-table-body').innerHTML = globalUnits.map((u, i) => {
+                const aiData = generateUnitAI(u);
+                return `
+                <tr class="hover:bg-slate-50 cursor-pointer" onclick="toggleAccordion('unit-details-${i}', 'unit-row')">
+                    <td class="p-4">
+                        <div class="font-black text-slate-800 text-[13px] uppercase tracking-tighter">${u.name} <span class="text-blue-500 text-[9px]">▼</span></div>
+                        <div class="text-lg font-black text-blue-900 mt-1">₹${u.coll.toLocaleString()}</div>
+                        <div class="flex gap-2 mt-2"><span class="bg-orange-100 text-orange-700 text-[9px] font-black px-1.5 py-0.5 rounded">SQUAD: ${u.sT}</span><span class="bg-emerald-100 text-emerald-700 text-[9px] font-black px-1.5 py-0.5 rounded">HOUSE: ${u.hT}</span></div>
+                    </td>
+                    <td class="p-4 text-right">
+                        <div class="font-black text-2xl leading-none text-slate-900">${u.percent}%</div>
+                        <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Goal: ₹${u.target.toLocaleString()}</div>
+                        <div class="w-20 ml-auto bg-slate-100 h-1.5 mt-2 rounded-full overflow-hidden border">
+                            <div class="h-full ${u.percent >= 80 ? 'bg-emerald-500' : (u.percent >= 50 ? 'bg-orange-500' : 'bg-rose-500')}" style="width: ${Math.min(u.percent, 100)}%"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="unit-details-${i}" class="hidden unit-row bg-slate-50"><td colspan="2" class="p-4">
+                    <div class="ai-card-glow p-4 mb-4 border-l-4 border-blue-600 shadow-sm">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="gemini-live-tag">GEMINI UNIT ANALYSIS</span>
+                        </div>
+                        <p class="text-[12px] font-bold text-slate-700 italic leading-relaxed mb-2">"${aiData.msg}"</p>
+                        <p class="text-[11px] font-black text-blue-600 uppercase border-t pt-2">${aiData.rem}</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl border text-[11px] text-center shadow-sm">
+                        <table class="w-full"><thead><tr class="border-b text-slate-400 font-black"><th>DATE</th><th>AMT</th><th>S</th><th>H</th></tr></thead>
+                        <tbody class="divide-y">${u.history.map(h => `<tr><td class="py-1.5">${h.date}</td><td class="font-bold">₹${h.amt}</td><td>${h.squad}</td><td>${h.house}</td></tr>`).join('')}</tbody></table>
+                    </div>
+                </td></tr>`;
+            }).join('');
+
+            renderChart(sortedPans);
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('panchayatChart').getContext('2d');
+            if (window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(p => p.name),
+                    datasets: [{ data: data.map(p => p.percent), backgroundColor: '#1e40af', borderRadius: 6 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false }, 
+                        datalabels: { anchor: 'end', align: 'top', font: { weight: 'bold', size: 10 }, formatter: (v) => v + '%' } 
+                    },
+                    scales: { y: { display: false, beginAtZero: true, max: 125 }, x: { ticks: { font: { size: 9, weight: 'bold' } }, grid: { display: false } } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
