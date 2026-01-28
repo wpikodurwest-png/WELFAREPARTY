@@ -18,11 +18,19 @@
     </style>
 </head>
 <body class="bg-gray-50 font-sans leading-normal">
+  
 
-    <header class="dashboard-header text-white p-5 text-center shadow-xl sticky top-0 z-50">
-        <h1 class="text-xl md:text-2xl font-black uppercase tracking-widest">Welfare Party Malappuram MANDALAM COLLECTION - 2026</h1>
-        <div id="countdown-timer" class="text-[10px] mt-1 font-bold bg-white/20 inline-block px-4 py-1 rounded-full text-white uppercase italic tracking-widest"></div>
-    </header>
+    <header class="dashboard-header text-white p-5 text-center shadow-xl sticky top-0 z-50 relative">
+    <div class="absolute left-4 top-1/2 -translate-y-1/2">
+        <a href="javascript:history.back()" class="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/20 shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+    </div>
+    <h1 class="text-lg md:text-2xl font-black uppercase tracking-widest pl-8">Welfare Party Malappuram mandalam collection -2026</h1>
+    <div id="countdown-timer" class="text-[10px] mt-1 font-bold bg-white/20 inline-block px-4 py-1 rounded-full text-white uppercase italic tracking-widest"></div>
+</header>
 
     <main class="p-2 md:p-8 max-w-7xl mx-auto space-y-6">
         
@@ -42,6 +50,8 @@
                 <div id="main-progress" class="progress-bar-fill h-full" style="width: 0%"></div>
             </div>
         </div>
+
+        <div id="ranking-container" class="grid grid-cols-3 gap-2"></div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-white p-5 rounded-3xl shadow-md border border-gray-200">
@@ -174,10 +184,44 @@
             const zeroUnits = units.filter(u => u.coll === 0);
             const achievers = units.filter(u => u.target > 0 && (u.coll >= u.target));
 
+            // --- RANKING LOGIC START (Metal Colors) ---
+            const rankedUnits = [...units].sort((a, b) => {
+                const percA = a.target > 0 ? (a.coll / a.target) : 0;
+                const percB = b.target > 0 ? (b.coll / b.target) : 0;
+                return percB - percA;
+            }).slice(0, 3);
+
+            const rankContainer = document.getElementById('ranking-container');
+            
+            // സ്വർണ്ണം, വെള്ളി, വെങ്കലം നിറങ്ങൾക്കായുള്ള സ്റ്റൈലുകൾ
+            const rankStyles = [
+                { border: 'border-yellow-500', bg: 'bg-yellow-50', text: 'text-yellow-700', icon: '🥇', label: 'GOLD' },   // Rank 1: Gold
+                { border: 'border-slate-400', bg: 'bg-slate-50', text: 'text-slate-600', icon: '🥈', label: 'SILVER' },  // Rank 2: Silver
+                { border: 'border-orange-700', bg: 'bg-orange-50', text: 'text-orange-800', icon: '🥉', label: 'BRONZE' } // Rank 3: Bronze
+            ];
+
+            rankContainer.innerHTML = rankedUnits.map((u, index) => {
+                const p = u.target > 0 ? ((u.coll / u.target) * 100).toFixed(1) : 0;
+                const style = rankStyles[index];
+                
+                return `
+                    <div class="${style.bg} p-2 md:p-4 rounded-2xl shadow-lg border-b-4 ${style.border} relative transition-all duration-300">
+                        <div class="flex flex-col items-center text-center">
+                            <span class="text-2xl md:text-3xl drop-shadow-sm">${style.icon}</span>
+                            <p class="text-[7px] font-black text-gray-400 mt-1 uppercase tracking-tighter">${style.label}</p>
+                            <h3 class="font-black text-gray-800 text-[10px] md:text-xs truncate w-full uppercase mt-0.5">${u.name}</h3>
+                            <div class="font-black ${style.text} text-sm md:text-xl mt-1">${p}%</div>
+                            <div class="text-[8px] font-bold text-gray-500 italic">₹${u.coll.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            // --- RANKING LOGIC END ---
+
             renderZeroBadges(zeroUnits);
             generateAchieverAI(achievers);
             renderUnitList(units, sortMode);
-            renderChart(units, sortMode);
+            renderChart(units, sortMode); 
             generateOverallAI(pan, units, overallPerc, totalTarget - totalColl, zeroUnits);
         }
 
