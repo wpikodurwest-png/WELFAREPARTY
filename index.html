@@ -313,31 +313,48 @@
         }
 
         function renderChart(units, mode) {
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-            const data = [...units].sort((a,b) => b.coll - a.coll).slice(0, 10);
-            if (myChart) myChart.destroy();
-            myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.map(u => u.name),
-                    datasets: [{
-                        label: mode === 'amount' ? 'സമാഹരിച്ചത് (₹)' : 'പൂർത്തിയായത് (%)',
-                        data: data.map(u => mode === 'amount' ? u.coll : (u.coll/u.target*100).toFixed(1)),
-                        backgroundColor: mode === 'amount' ? '#10b981' : '#1e40af',
-                        borderRadius: 8
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { beginAtZero: true, max: mode === 'percent' ? 100 : undefined, grid: { color: '#f3f4f6' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    // ടാർഗെറ്റ് % ആണോ അതോ തുകയാണോ എന്ന് നോക്കി ഡാറ്റ സോർട്ട് ചെയ്യുന്നു
+    const sortedData = [...units].sort((a, b) => {
+        if (mode === 'percent') {
+            const percA = a.target > 0 ? (a.coll / a.target) : 0;
+            const percB = b.target > 0 ? (b.coll / b.target) : 0;
+            return percB - percA; // ശതമാനത്തിന്റെ അടിസ്ഥാനത്തിൽ ഏറ്റവും ഉയർന്നത് ആദ്യം
         }
+        return b.coll - a.coll; // തുകയുടെ അടിസ്ഥാനത്തിൽ ഏറ്റവും ഉയർന്നത് ആദ്യം
+    }).slice(0, 10); // മികച്ച 10 യൂണിറ്റുകൾ മാത്രം കാണിക്കാൻ
+
+    if (myChart) myChart.destroy();
+    myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sortedData.map(u => u.name),
+            datasets: [{
+                label: mode === 'amount' ? 'സമാഹരിച്ചത് (₹)' : 'പൂർത്തിയായത് (%)',
+                data: sortedData.map(u => mode === 'amount' ? u.coll : ((u.coll / u.target) * 100).toFixed(1)),
+                backgroundColor: mode === 'amount' ? '#10b981' : '#1e40af',
+                borderRadius: 8
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: { 
+                y: { 
+                    beginAtZero: true, 
+                    // ശതമാനമാണെങ്കിൽ മാത്രം Y-Axis പരമാവധി 100 ആയി നിജപ്പെടുത്തുന്നു
+                    max: mode === 'percent' ? 100 : undefined, 
+                    grid: { color: '#f3f4f6' } 
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
     </script>
 </body>
 </html>
+
