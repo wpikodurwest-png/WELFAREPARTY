@@ -64,7 +64,7 @@
 
         <div id="achiever-container" class="hidden bg-green-50 p-6 rounded-3xl shadow-lg border-2 border-green-200">
             <h3 class="font-black text-green-800 uppercase text-[10px] mb-3 flex items-center gap-2 tracking-widest">
-                🏆 ലക്ഷ്യം പൂർത്തിയാക്കിയവർ (വിജയഗാഥകൾ)
+                🏆 ലക്ഷ്യം പൂർത്തിയാക്കിയവർ 
             </h3>
             <div id="achiever-ai-content" class="text-sm md:text-base text-green-900 italic leading-relaxed font-medium"></div>
         </div>
@@ -81,7 +81,7 @@
 
         <div id="zero-container" class="hidden bg-red-600 p-5 rounded-3xl shadow-xl glow-red">
             <p class="text-white font-black text-[10px] uppercase mb-3 flex items-center gap-2 tracking-widest">
-                🚨 അടിയന്തര ശ്രദ്ധയ്ക്ക്: പ്രവർത്തനം തുടങ്ങാത്ത യൂണിറ്റുകൾ
+                🚨 അടിയന്തര ശ്രദ്ധയ്ക്ക്: റിപ്പോർട് നൽകാത്ത യൂണിറ്റുകൾ
             </p>
             <div id="zero-badge-list" class="flex flex-wrap gap-2"></div>
         </div>
@@ -194,7 +194,7 @@
             ];
 
             rankContainer.innerHTML = rankedUnits.map((u, index) => {
-                const p = u.target > 0 ? ((u.coll / u.target) * 100).toFixed(1) : 0;
+                const p = u.target > 0 ? ((u.coll / u.target) * 150.toFixed(1) : 0;
                 const style = rankStyles[index];
                 
                 return `
@@ -323,7 +323,7 @@
             return percB - percA; // ശതമാനത്തിന്റെ അടിസ്ഥാനത്തിൽ ഏറ്റവും ഉയർന്നത് ആദ്യം
         }
         return b.coll - a.coll; // തുകയുടെ അടിസ്ഥാനത്തിൽ ഏറ്റവും ഉയർന്നത് ആദ്യം
-    }).slice(0, 15); // മികച്ച 10 യൂണിറ്റുകൾ മാത്രം കാണിക്കാൻ
+    }).slice(0, 10); // മികച്ച 10 യൂണിറ്റുകൾ മാത്രം കാണിക്കാൻ
 
     if (myChart) myChart.destroy();
     myChart = new Chart(ctx, {
@@ -357,6 +357,7 @@
     </script>
 </body>
 </html>
+
 
 
 
